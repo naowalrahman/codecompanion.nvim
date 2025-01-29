@@ -185,6 +185,31 @@ function UI:format_header(role)
   return header
 end
 
+---Create namespaces for the diagnostic messages
+---@return CodeCompanion.Chat.UI
+function UI:set_diagnostic_namespaces()
+  if not config.display.chat.show_settings then
+    return self
+  end
+
+  config.INFO_NS = api.nvim_create_namespace("CodeCompanion-info")
+  config.ERROR_NS = api.nvim_create_namespace("CodeCompanion-error")
+
+  local diagnostic_config = {
+    underline = false,
+    virtual_text = {
+      spacing = 2,
+      severity = { min = vim.diagnostic.severity.INFO },
+    },
+    signs = false,
+  }
+
+  vim.diagnostic.config(diagnostic_config, config.INFO_NS)
+  vim.diagnostic.config(diagnostic_config, config.ERROR_NS)
+
+  return self
+end
+
 ---Format the header in the chat buffer
 ---@param tbl table containing the buffer contents
 ---@param role string The role of the user to display in the header

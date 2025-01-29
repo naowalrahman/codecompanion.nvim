@@ -213,6 +213,7 @@ function Chat.new(args)
   if not self.adapter then
     return log:error("No adapter found")
   end
+
   util.fire("ChatAdapter", {
     bufnr = self.bufnr,
     adapter = adapters.make_safe(self.adapter),
@@ -231,7 +232,8 @@ function Chat.new(args)
   })
 
   self.close_last_chat()
-  self.ui:open():render(self.context, self.messages, self.opts):set_extmarks(self.opts)
+  self.ui:open()
+  self:setup_ui()
 
   if config.strategies.chat.keymaps then
     keymaps
@@ -252,6 +254,12 @@ function Chat.new(args)
     self:submit()
   end
 
+  return self
+end
+
+---Setup the UI in the chat buffer
+function Chat:setup_ui()
+  self.ui:render(self.context, self.messages, self.opts):set_extmarks(self.opts):set_diagnostic_namespaces()
   return self
 end
 
@@ -1015,7 +1023,7 @@ function Chat:clear()
   self.tools_in_use = {}
 
   log:trace("Clearing chat buffer")
-  self.ui:render(self.context, self.messages, self.opts):set_extmarks(self.opts)
+  self:setup_ui()
   self:set_system_prompt()
 end
 

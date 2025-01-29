@@ -8,9 +8,9 @@ if vim.fn.has("nvim-0.10.0") == 0 then
   return vim.notify("CodeCompanion.nvim requires Neovim 0.10.0+", vim.log.levels.ERROR)
 end
 
-local config = require('codecompanion.config')
+local config = require("codecompanion.config")
 local api = vim.api
-local log = require('codecompanion.utils.log')
+local log = require("codecompanion.utils.log")
 
 -- Create the user commands
 local cmds = require("codecompanion.commands")
@@ -44,30 +44,15 @@ api.nvim_create_autocmd("FileType", {
       vim.cmd.syntax('match CodeCompanionChatTool "@' .. name .. '"')
     end)
     vim
-        .iter(config.strategies.chat.agents)
-        :filter(function(name)
-          return name ~= "tools"
-        end)
-        :each(function(name, _)
-          vim.cmd.syntax('match CodeCompanionChatAgent "@' .. name .. '"')
-        end)
+      .iter(config.strategies.chat.agents)
+      :filter(function(name)
+        return name ~= "tools"
+      end)
+      :each(function(name, _)
+        vim.cmd.syntax('match CodeCompanionChatAgent "@' .. name .. '"')
+      end)
   end),
 })
-
--- TODO: Move to chat buffer
-config.INFO_NS = api.nvim_create_namespace("CodeCompanion-info")
-config.ERROR_NS = api.nvim_create_namespace("CodeCompanion-error")
-
-local diagnostic_config = {
-  underline = false,
-  virtual_text = {
-    spacing = 2,
-    severity = { min = vim.diagnostic.severity.INFO },
-  },
-  signs = false,
-}
-vim.diagnostic.config(diagnostic_config, config.INFO_NS)
-vim.diagnostic.config(diagnostic_config, config.ERROR_NS)
 
 log.set_root(log.new({
   handlers = {
